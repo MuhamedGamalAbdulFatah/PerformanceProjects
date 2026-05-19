@@ -104,7 +104,7 @@ def operatorCode = vars.get(&quot;OperatorCode&quot;) ?: &quot;60202&quot;
 // Secret Key INLINE (raw string - NO Base64 decode)
 def secretKey = &quot;HeGIrdno4F9TNb4DPC450mzZtRbO9etvnEclH9Bu1wg=&quot;
 
-// Timestamp format المطلوب (بدون ms) + مختلف لكل thread
+// Timestamp format
 def fmt = new SimpleDateFormat(&quot;yyyy-MM-dd HH:mm:ss&quot;)
 def timestamp = fmt.format(new Date(System.currentTimeMillis() + (ctx.getThreadNum() * 1000L)))
 
