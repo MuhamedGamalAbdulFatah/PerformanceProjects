@@ -1,0 +1,1188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jmeterTestPlan version="1.2" properties="5.0" jmeter="5.6.3">
+  <hashTree>
+    <TestPlan guiclass="TestPlanGui" testclass="TestPlan" testname="CloudCom Dispatcher">
+      <stringProp name="TestPlan.comments">Performance collection for CloudCom Banking SMS APIs</stringProp>
+      <boolProp name="TestPlan.tearDown_on_shutdown">true</boolProp>
+      <elementProp name="TestPlan.user_defined_variables" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" testname="User Defined Variables">
+        <collectionProp name="Arguments.arguments"/>
+      </elementProp>
+    </TestPlan>
+    <hashTree>
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Performance Thread Group - Dispatcher - Single">
+        <intProp name="ThreadGroup.num_threads">15</intProp>
+        <intProp name="ThreadGroup.ramp_time">1</intProp>
+        <longProp name="ThreadGroup.duration">120</longProp>
+        <longProp name="ThreadGroup.delay">0</longProp>
+        <boolProp name="ThreadGroup.same_user_on_next_iteration">true</boolProp>
+        <boolProp name="ThreadGroup.scheduler">true</boolProp>
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller">
+          <intProp name="LoopController.loops">-1</intProp>
+          <boolProp name="LoopController.continue_forever">false</boolProp>
+        </elementProp>
+      </ThreadGroup>
+      <hashTree>
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Generate Token">
+          <stringProp name="HTTPSampler.domain">10.2.10.209</stringProp>
+          <stringProp name="HTTPSampler.port">5051</stringProp>
+          <stringProp name="HTTPSampler.protocol">https</stringProp>
+          <stringProp name="HTTPSampler.path">/api/OAuth/token</stringProp>
+          <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+          <stringProp name="HTTPSampler.method">POST</stringProp>
+          <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+          <boolProp name="HTTPSampler.postBodyRaw">false</boolProp>
+          <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables">
+            <collectionProp name="Arguments.arguments">
+              <elementProp name="ClientId" elementType="HTTPArgument">
+                <boolProp name="HTTPArgument.always_encode">true</boolProp>
+                <stringProp name="Argument.value">cn_22d1c3a1b93c48e3ae3e7b29914e0d40</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+                <boolProp name="HTTPArgument.use_equals">true</boolProp>
+                <stringProp name="Argument.name">ClientId</stringProp>
+              </elementProp>
+              <elementProp name="ClientSecret" elementType="HTTPArgument">
+                <boolProp name="HTTPArgument.always_encode">true</boolProp>
+                <stringProp name="Argument.value">kL+r5kPUIrVtV4m7jQQF5zkYAQhymS89o5WuqouAPAs=</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+                <boolProp name="HTTPArgument.use_equals">true</boolProp>
+                <stringProp name="Argument.name">ClientSecret</stringProp>
+              </elementProp>
+              <elementProp name="GrantType" elementType="HTTPArgument">
+                <boolProp name="HTTPArgument.always_encode">true</boolProp>
+                <stringProp name="Argument.value">client_credentials</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+                <boolProp name="HTTPArgument.use_equals">true</boolProp>
+                <stringProp name="Argument.name">GrantType</stringProp>
+              </elementProp>
+            </collectionProp>
+          </elementProp>
+        </HTTPSamplerProxy>
+        <hashTree>
+          <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="Header Manager - Token">
+            <collectionProp name="HeaderManager.headers">
+              <elementProp name="" elementType="Header">
+                <stringProp name="Header.name">Content-Type</stringProp>
+                <stringProp name="Header.value">application/x-www-form-urlencoded</stringProp>
+              </elementProp>
+              <elementProp name="" elementType="Header">
+                <stringProp name="Header.name">Accept</stringProp>
+                <stringProp name="Header.value">application/json</stringProp>
+              </elementProp>
+            </collectionProp>
+          </HeaderManager>
+          <hashTree/>
+          <JSONPostProcessor guiclass="JSONPostProcessorGui" testclass="JSONPostProcessor" testname="Extract Access Token">
+            <stringProp name="JSONPostProcessor.referenceNames">accessToken</stringProp>
+            <stringProp name="JSONPostProcessor.jsonPathExprs">$.accessToken</stringProp>
+            <stringProp name="JSONPostProcessor.match_numbers">1</stringProp>
+            <stringProp name="JSONPostProcessor.defaultValues">TOKEN_NOT_FOUND</stringProp>
+          </JSONPostProcessor>
+          <hashTree/>
+        </hashTree>
+        <TransactionController guiclass="TransactionControllerGui" testclass="TransactionController" testname="Full Dispatcher Performance Session">
+          <boolProp name="TransactionController.parent">true</boolProp>
+          <boolProp name="TransactionController.includeTimers">false</boolProp>
+        </TransactionController>
+        <hashTree>
+          <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="Header Manager - Dispatcher">
+            <collectionProp name="HeaderManager.headers">
+              <elementProp name="" elementType="Header">
+                <stringProp name="Header.name">Content-Type</stringProp>
+                <stringProp name="Header.value">application/json</stringProp>
+              </elementProp>
+              <elementProp name="" elementType="Header">
+                <stringProp name="Header.name">Accept</stringProp>
+                <stringProp name="Header.value">application/json</stringProp>
+              </elementProp>
+              <elementProp name="" elementType="Header">
+                <stringProp name="Header.name">Authorization</stringProp>
+                <stringProp name="Header.value">Bearer ${accessToken}</stringProp>
+              </elementProp>
+            </collectionProp>
+          </HeaderManager>
+          <hashTree/>
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Submit Single SMS">
+            <stringProp name="HTTPSampler.domain">10.2.10.209</stringProp>
+            <stringProp name="HTTPSampler.port">5051</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
+            <stringProp name="HTTPSampler.path">/api/dispatcher/sms/single</stringProp>
+            <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+            <stringProp name="HTTPSampler.method">POST</stringProp>
+            <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+            <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+            <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+              <collectionProp name="Arguments.arguments">
+                <elementProp name="" elementType="HTTPArgument">
+                  <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                  <stringProp name="Argument.value">{&#xd;
+    &quot;sender&quot;: &quot;BankTest&quot;,&#xd;
+    &quot;trafficType&quot;:2,&#xd;
+    &quot;priority&quot;:1,&#xd;
+    &quot;clientSource&quot;: &quot;cloudcom Disp&quot;, &#xd;
+    &quot;ClientRequestId&quot;: &quot;fksjhsfkjkg&quot;,&#xd;
+    &quot;clientMessageId&quot;: &quot;10035&quot;,&#xd;
+    &quot;msisdn&quot;: &quot;201287385179&quot;,&#xd;
+    &quot;body&quot;: &quot;Hello Single&quot;   &#xd;
+}</stringProp>
+                  <stringProp name="Argument.metadata">=</stringProp>
+                </elementProp>
+              </collectionProp>
+            </elementProp>
+          </HTTPSamplerProxy>
+          <hashTree/>
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Encrypt" enabled="false">
+            <stringProp name="HTTPSampler.domain">10.2.10.209</stringProp>
+            <stringProp name="HTTPSampler.port">5051</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
+            <stringProp name="HTTPSampler.path">/api/EncryptionHelper/Encrypt</stringProp>
+            <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+            <stringProp name="HTTPSampler.method">POST</stringProp>
+            <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+            <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+            <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+              <collectionProp name="Arguments.arguments">
+                <elementProp name="" elementType="HTTPArgument">
+                  <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                  <stringProp name="Argument.value">{&#xd;
+    &quot;plainText&quot;: &quot;cloudcom@2026_NewCpass&quot;  &#xd;
+}</stringProp>
+                  <stringProp name="Argument.metadata">=</stringProp>
+                </elementProp>
+              </collectionProp>
+            </elementProp>
+          </HTTPSamplerProxy>
+          <hashTree/>
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Add All Pending Requests To Queue" enabled="false">
+            <stringProp name="HTTPSampler.domain">10.2.10.209</stringProp>
+            <stringProp name="HTTPSampler.port">5051</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
+            <stringProp name="HTTPSampler.path">/api/QueueControl/AddAllPendingRequestsToQueue</stringProp>
+            <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+            <stringProp name="HTTPSampler.method">POST</stringProp>
+            <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+            <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+            <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+              <collectionProp name="Arguments.arguments">
+                <elementProp name="" elementType="HTTPArgument">
+                  <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                  <stringProp name="Argument.value">{&#xd;
+    &quot;from&quot;: &quot;2025-01-15T00:00:00Z&quot;,&#xd;
+    &quot;to&quot;: &quot;2025-12-15T20:30:00Z&quot; &#xd;
+}</stringProp>
+                  <stringProp name="Argument.metadata">=</stringProp>
+                </elementProp>
+              </collectionProp>
+            </elementProp>
+          </HTTPSamplerProxy>
+          <hashTree/>
+        </hashTree>
+        <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="View Results Tree">
+          <boolProp name="ResultCollector.error_logging">false</boolProp>
+          <objProp>
+            <name>saveConfig</name>
+            <value class="SampleSaveConfiguration">
+              <time>true</time>
+              <latency>true</latency>
+              <timestamp>true</timestamp>
+              <success>true</success>
+              <label>true</label>
+              <code>true</code>
+              <message>true</message>
+              <threadName>true</threadName>
+              <dataType>true</dataType>
+              <encoding>false</encoding>
+              <assertions>true</assertions>
+              <subresults>true</subresults>
+              <responseData>false</responseData>
+              <samplerData>false</samplerData>
+              <xml>false</xml>
+              <fieldNames>true</fieldNames>
+              <responseHeaders>false</responseHeaders>
+              <requestHeaders>false</requestHeaders>
+              <responseDataOnError>false</responseDataOnError>
+              <saveAssertionResultsFailureMessage>true</saveAssertionResultsFailureMessage>
+              <assertionsResultsToSave>0</assertionsResultsToSave>
+              <bytes>true</bytes>
+              <sentBytes>true</sentBytes>
+              <url>true</url>
+              <threadCounts>true</threadCounts>
+              <idleTime>true</idleTime>
+              <connectTime>true</connectTime>
+            </value>
+          </objProp>
+          <stringProp name="filename"></stringProp>
+        </ResultCollector>
+        <hashTree/>
+        <ResultCollector guiclass="SummaryReport" testclass="ResultCollector" testname="Summary Report">
+          <boolProp name="ResultCollector.error_logging">false</boolProp>
+          <objProp>
+            <name>saveConfig</name>
+            <value class="SampleSaveConfiguration">
+              <time>true</time>
+              <latency>true</latency>
+              <timestamp>true</timestamp>
+              <success>true</success>
+              <label>true</label>
+              <code>true</code>
+              <message>true</message>
+              <threadName>true</threadName>
+              <dataType>true</dataType>
+              <encoding>false</encoding>
+              <assertions>true</assertions>
+              <subresults>true</subresults>
+              <responseData>false</responseData>
+              <samplerData>false</samplerData>
+              <xml>false</xml>
+              <fieldNames>true</fieldNames>
+              <responseHeaders>false</responseHeaders>
+              <requestHeaders>false</requestHeaders>
+              <responseDataOnError>false</responseDataOnError>
+              <saveAssertionResultsFailureMessage>true</saveAssertionResultsFailureMessage>
+              <assertionsResultsToSave>0</assertionsResultsToSave>
+              <bytes>true</bytes>
+              <sentBytes>true</sentBytes>
+              <url>true</url>
+              <threadCounts>true</threadCounts>
+              <idleTime>true</idleTime>
+              <connectTime>true</connectTime>
+            </value>
+          </objProp>
+          <stringProp name="filename"></stringProp>
+        </ResultCollector>
+        <hashTree/>
+        <ResultCollector guiclass="StatVisualizer" testclass="ResultCollector" testname="Aggregate Report">
+          <boolProp name="ResultCollector.error_logging">false</boolProp>
+          <objProp>
+            <name>saveConfig</name>
+            <value class="SampleSaveConfiguration">
+              <time>true</time>
+              <latency>true</latency>
+              <timestamp>true</timestamp>
+              <success>true</success>
+              <label>true</label>
+              <code>true</code>
+              <message>true</message>
+              <threadName>true</threadName>
+              <dataType>true</dataType>
+              <encoding>false</encoding>
+              <assertions>true</assertions>
+              <subresults>true</subresults>
+              <responseData>false</responseData>
+              <samplerData>false</samplerData>
+              <xml>false</xml>
+              <fieldNames>true</fieldNames>
+              <responseHeaders>false</responseHeaders>
+              <requestHeaders>false</requestHeaders>
+              <responseDataOnError>false</responseDataOnError>
+              <saveAssertionResultsFailureMessage>true</saveAssertionResultsFailureMessage>
+              <assertionsResultsToSave>0</assertionsResultsToSave>
+              <bytes>true</bytes>
+              <sentBytes>true</sentBytes>
+              <url>true</url>
+              <threadCounts>true</threadCounts>
+              <idleTime>true</idleTime>
+              <connectTime>true</connectTime>
+            </value>
+          </objProp>
+          <stringProp name="filename"></stringProp>
+        </ResultCollector>
+        <hashTree/>
+      </hashTree>
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Performance Thread Group - Dispatcher - Bulk" enabled="false">
+        <intProp name="ThreadGroup.num_threads">10</intProp>
+        <intProp name="ThreadGroup.ramp_time">1</intProp>
+        <longProp name="ThreadGroup.duration">120</longProp>
+        <longProp name="ThreadGroup.delay">0</longProp>
+        <boolProp name="ThreadGroup.same_user_on_next_iteration">true</boolProp>
+        <boolProp name="ThreadGroup.scheduler">true</boolProp>
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller">
+          <stringProp name="LoopController.loops">640</stringProp>
+          <boolProp name="LoopController.continue_forever">false</boolProp>
+        </elementProp>
+      </ThreadGroup>
+      <hashTree>
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Generate Token">
+          <stringProp name="HTTPSampler.domain">10.2.10.209</stringProp>
+          <stringProp name="HTTPSampler.port">5051</stringProp>
+          <stringProp name="HTTPSampler.protocol">https</stringProp>
+          <stringProp name="HTTPSampler.path">/api/OAuth/token</stringProp>
+          <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+          <stringProp name="HTTPSampler.method">POST</stringProp>
+          <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+          <boolProp name="HTTPSampler.postBodyRaw">false</boolProp>
+          <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables">
+            <collectionProp name="Arguments.arguments">
+              <elementProp name="ClientId" elementType="HTTPArgument">
+                <boolProp name="HTTPArgument.always_encode">true</boolProp>
+                <stringProp name="Argument.value">cn_22d1c3a1b93c48e3ae3e7b29914e0d40</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+                <boolProp name="HTTPArgument.use_equals">true</boolProp>
+                <stringProp name="Argument.name">ClientId</stringProp>
+              </elementProp>
+              <elementProp name="ClientSecret" elementType="HTTPArgument">
+                <boolProp name="HTTPArgument.always_encode">true</boolProp>
+                <stringProp name="Argument.value">kL+r5kPUIrVtV4m7jQQF5zkYAQhymS89o5WuqouAPAs=</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+                <boolProp name="HTTPArgument.use_equals">true</boolProp>
+                <stringProp name="Argument.name">ClientSecret</stringProp>
+              </elementProp>
+              <elementProp name="GrantType" elementType="HTTPArgument">
+                <boolProp name="HTTPArgument.always_encode">true</boolProp>
+                <stringProp name="Argument.value">client_credentials</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+                <boolProp name="HTTPArgument.use_equals">true</boolProp>
+                <stringProp name="Argument.name">GrantType</stringProp>
+              </elementProp>
+            </collectionProp>
+          </elementProp>
+        </HTTPSamplerProxy>
+        <hashTree>
+          <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="Header Manager - Token">
+            <collectionProp name="HeaderManager.headers">
+              <elementProp name="" elementType="Header">
+                <stringProp name="Header.name">Content-Type</stringProp>
+                <stringProp name="Header.value">application/x-www-form-urlencoded</stringProp>
+              </elementProp>
+              <elementProp name="" elementType="Header">
+                <stringProp name="Header.name">Accept</stringProp>
+                <stringProp name="Header.value">application/json</stringProp>
+              </elementProp>
+            </collectionProp>
+          </HeaderManager>
+          <hashTree/>
+          <JSONPostProcessor guiclass="JSONPostProcessorGui" testclass="JSONPostProcessor" testname="Extract Access Token">
+            <stringProp name="JSONPostProcessor.referenceNames">accessToken</stringProp>
+            <stringProp name="JSONPostProcessor.jsonPathExprs">$.accessToken</stringProp>
+            <stringProp name="JSONPostProcessor.match_numbers">1</stringProp>
+            <stringProp name="JSONPostProcessor.defaultValues">TOKEN_NOT_FOUND</stringProp>
+          </JSONPostProcessor>
+          <hashTree/>
+        </hashTree>
+        <TransactionController guiclass="TransactionControllerGui" testclass="TransactionController" testname="Full Dispatcher Performance Session">
+          <boolProp name="TransactionController.parent">true</boolProp>
+          <boolProp name="TransactionController.includeTimers">false</boolProp>
+        </TransactionController>
+        <hashTree>
+          <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="Header Manager - Dispatcher">
+            <collectionProp name="HeaderManager.headers">
+              <elementProp name="" elementType="Header">
+                <stringProp name="Header.name">Content-Type</stringProp>
+                <stringProp name="Header.value">application/json</stringProp>
+              </elementProp>
+              <elementProp name="" elementType="Header">
+                <stringProp name="Header.name">Accept</stringProp>
+                <stringProp name="Header.value">application/json</stringProp>
+              </elementProp>
+              <elementProp name="" elementType="Header">
+                <stringProp name="Header.name">Authorization</stringProp>
+                <stringProp name="Header.value">Bearer ${accessToken}</stringProp>
+              </elementProp>
+            </collectionProp>
+          </HeaderManager>
+          <hashTree/>
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Submit Bulk SMS">
+            <stringProp name="HTTPSampler.domain">10.2.10.209</stringProp>
+            <stringProp name="HTTPSampler.port">5051</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
+            <stringProp name="HTTPSampler.path">/api/dispatcher/sms/bulk</stringProp>
+            <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+            <stringProp name="HTTPSampler.method">POST</stringProp>
+            <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+            <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+            <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+              <collectionProp name="Arguments.arguments">
+                <elementProp name="" elementType="HTTPArgument">
+                  <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                  <stringProp name="Argument.value">{&#xd;
+    &quot;trafficType&quot;: 3,&#xd;
+    &quot;campaignId&quot;: &quot;667&quot;,&#xd;
+    &quot;priority&quot;: 1,&#xd;
+    &quot;clientSource&quot;: &quot;CRM&quot;,&#xd;
+    &quot;ClientRequestId&quot;: &quot;KoxMaghraby Test&quot;, &#xd;
+    &quot;CampaignName&quot;: &quot;Transactional Campaign&quot;,&#xd;
+    &quot;sender&quot;: &quot;BankTest&quot;,&#xd;
+    &quot;messages&quot;: [&#xd;
+        {&#xd;
+            &quot;ClientMessageId&quot;: &quot;701&quot;,&#xd;
+            &quot;Msisdn&quot;: &quot;201020362608&quot;,&#xd;
+            &quot;Body&quot;: &quot;Hello&quot;&#xd;
+        },&#xd;
+        {&#xd;
+            &quot;ClientMessageId&quot;: &quot;701&quot;,&#xd;
+            &quot;Msisdn&quot;: &quot;201020362608&quot;,&#xd;
+            &quot;Body&quot;: &quot;Hello&quot;&#xd;
+        },&#xd;
+        {&#xd;
+            &quot;ClientMessageId&quot;: &quot;701&quot;,&#xd;
+            &quot;Msisdn&quot;: &quot;201020362608&quot;,&#xd;
+            &quot;Body&quot;: &quot;Hello&quot;&#xd;
+        },&#xd;
+        {&#xd;
+            &quot;ClientMessageId&quot;: &quot;701&quot;,&#xd;
+            &quot;Msisdn&quot;: &quot;201020362608&quot;,&#xd;
+            &quot;Body&quot;: &quot;Hello&quot;&#xd;
+        },&#xd;
+        {&#xd;
+            &quot;ClientMessageId&quot;: &quot;701&quot;,&#xd;
+            &quot;Msisdn&quot;: &quot;201020362608&quot;,&#xd;
+            &quot;Body&quot;: &quot;Hello&quot;&#xd;
+        },&#xd;
+        {&#xd;
+            &quot;ClientMessageId&quot;: &quot;701&quot;,&#xd;
+            &quot;Msisdn&quot;: &quot;201020362608&quot;,&#xd;
+            &quot;Body&quot;: &quot;Hello&quot;&#xd;
+        },&#xd;
+        {&#xd;
+            &quot;ClientMessageId&quot;: &quot;701&quot;,&#xd;
+            &quot;Msisdn&quot;: &quot;201020362608&quot;,&#xd;
+            &quot;Body&quot;: &quot;Hello&quot;&#xd;
+        },&#xd;
+        {&#xd;
+            &quot;ClientMessageId&quot;: &quot;701&quot;,&#xd;
+            &quot;Msisdn&quot;: &quot;201020362608&quot;,&#xd;
+            &quot;Body&quot;: &quot;Hello&quot;&#xd;
+        },&#xd;
+        {&#xd;
+            &quot;ClientMessageId&quot;: &quot;701&quot;,&#xd;
+            &quot;Msisdn&quot;: &quot;201020362608&quot;,&#xd;
+            &quot;Body&quot;: &quot;Hello&quot;&#xd;
+        },&#xd;
+        {&#xd;
+            &quot;ClientMessageId&quot;: &quot;701&quot;,&#xd;
+            &quot;Msisdn&quot;: &quot;201020362608&quot;,&#xd;
+            &quot;Body&quot;: &quot;Hello&quot;&#xd;
+        },&#xd;
+        {&#xd;
+            &quot;ClientMessageId&quot;: &quot;701&quot;,&#xd;
+            &quot;Msisdn&quot;: &quot;201020362608&quot;,&#xd;
+            &quot;Body&quot;: &quot;Hello&quot;&#xd;
+        },&#xd;
+        {&#xd;
+            &quot;ClientMessageId&quot;: &quot;701&quot;,&#xd;
+            &quot;Msisdn&quot;: &quot;201020362608&quot;,&#xd;
+            &quot;Body&quot;: &quot;Hello&quot;&#xd;
+        },&#xd;
+        {&#xd;
+            &quot;ClientMessageId&quot;: &quot;701&quot;,&#xd;
+            &quot;Msisdn&quot;: &quot;201020362608&quot;,&#xd;
+            &quot;Body&quot;: &quot;Hello&quot;&#xd;
+        },&#xd;
+        {&#xd;
+            &quot;ClientMessageId&quot;: &quot;701&quot;,&#xd;
+            &quot;Msisdn&quot;: &quot;201020362608&quot;,&#xd;
+            &quot;Body&quot;: &quot;Hello&quot;&#xd;
+        },&#xd;
+        {&#xd;
+            &quot;ClientMessageId&quot;: &quot;701&quot;,&#xd;
+            &quot;Msisdn&quot;: &quot;201020362608&quot;,&#xd;
+            &quot;Body&quot;: &quot;Hello&quot;&#xd;
+        },&#xd;
+        {&#xd;
+            &quot;ClientMessageId&quot;: &quot;701&quot;,&#xd;
+            &quot;Msisdn&quot;: &quot;201020362608&quot;,&#xd;
+            &quot;Body&quot;: &quot;Hello&quot;&#xd;
+        },&#xd;
+        {&#xd;
+            &quot;ClientMessageId&quot;: &quot;701&quot;,&#xd;
+            &quot;Msisdn&quot;: &quot;201020362608&quot;,&#xd;
+            &quot;Body&quot;: &quot;Hello&quot;&#xd;
+        },&#xd;
+        {&#xd;
+            &quot;ClientMessageId&quot;: &quot;701&quot;,&#xd;
+            &quot;Msisdn&quot;: &quot;201020362608&quot;,&#xd;
+            &quot;Body&quot;: &quot;Hello&quot;&#xd;
+        },&#xd;
+        {&#xd;
+            &quot;ClientMessageId&quot;: &quot;701&quot;,&#xd;
+            &quot;Msisdn&quot;: &quot;201020362608&quot;,&#xd;
+            &quot;Body&quot;: &quot;Hello&quot;&#xd;
+        },&#xd;
+        {&#xd;
+            &quot;ClientMessageId&quot;: &quot;701&quot;,&#xd;
+            &quot;Msisdn&quot;: &quot;201020362608&quot;,&#xd;
+            &quot;Body&quot;: &quot;Hello&quot;&#xd;
+        },&#xd;
+        {&#xd;
+            &quot;ClientMessageId&quot;: &quot;701&quot;,&#xd;
+            &quot;Msisdn&quot;: &quot;201020362608&quot;,&#xd;
+            &quot;Body&quot;: &quot;Hello&quot;&#xd;
+        },&#xd;
+        {&#xd;
+            &quot;ClientMessageId&quot;: &quot;701&quot;,&#xd;
+            &quot;Msisdn&quot;: &quot;201020362608&quot;,&#xd;
+            &quot;Body&quot;: &quot;Hello&quot;&#xd;
+        },&#xd;
+        {&#xd;
+            &quot;ClientMessageId&quot;: &quot;701&quot;,&#xd;
+            &quot;Msisdn&quot;: &quot;201020362608&quot;,&#xd;
+            &quot;Body&quot;: &quot;Hello&quot;&#xd;
+        },&#xd;
+        {&#xd;
+            &quot;ClientMessageId&quot;: &quot;701&quot;,&#xd;
+            &quot;Msisdn&quot;: &quot;201020362608&quot;,&#xd;
+            &quot;Body&quot;: &quot;Hello&quot;&#xd;
+        },&#xd;
+        {&#xd;
+            &quot;ClientMessageId&quot;: &quot;701&quot;,&#xd;
+            &quot;Msisdn&quot;: &quot;201020362608&quot;,&#xd;
+            &quot;Body&quot;: &quot;Hello&quot;&#xd;
+        },&#xd;
+        {&#xd;
+            &quot;ClientMessageId&quot;: &quot;701&quot;,&#xd;
+            &quot;Msisdn&quot;: &quot;201020362608&quot;,&#xd;
+            &quot;Body&quot;: &quot;Hello&quot;&#xd;
+        },&#xd;
+        {&#xd;
+            &quot;ClientMessageId&quot;: &quot;701&quot;,&#xd;
+            &quot;Msisdn&quot;: &quot;201020362608&quot;,&#xd;
+            &quot;Body&quot;: &quot;Hello&quot;&#xd;
+        },&#xd;
+        {&#xd;
+            &quot;ClientMessageId&quot;: &quot;701&quot;,&#xd;
+            &quot;Msisdn&quot;: &quot;201020362608&quot;,&#xd;
+            &quot;Body&quot;: &quot;Hello&quot;&#xd;
+        },&#xd;
+        {&#xd;
+            &quot;ClientMessageId&quot;: &quot;701&quot;,&#xd;
+            &quot;Msisdn&quot;: &quot;201020362608&quot;,&#xd;
+            &quot;Body&quot;: &quot;Hello&quot;&#xd;
+        },&#xd;
+        {&#xd;
+            &quot;ClientMessageId&quot;: &quot;701&quot;,&#xd;
+            &quot;Msisdn&quot;: &quot;201020362608&quot;,&#xd;
+            &quot;Body&quot;: &quot;Hello&quot;&#xd;
+        },&#xd;
+        {&#xd;
+            &quot;ClientMessageId&quot;: &quot;701&quot;,&#xd;
+            &quot;Msisdn&quot;: &quot;201020362608&quot;,&#xd;
+            &quot;Body&quot;: &quot;Hello&quot;&#xd;
+        },&#xd;
+        {&#xd;
+            &quot;ClientMessageId&quot;: &quot;701&quot;,&#xd;
+            &quot;Msisdn&quot;: &quot;201020362608&quot;,&#xd;
+            &quot;Body&quot;: &quot;Hello&quot;&#xd;
+        },&#xd;
+        {&#xd;
+            &quot;ClientMessageId&quot;: &quot;701&quot;,&#xd;
+            &quot;Msisdn&quot;: &quot;201020362608&quot;,&#xd;
+            &quot;Body&quot;: &quot;Hello&quot;&#xd;
+        },&#xd;
+        {&#xd;
+            &quot;ClientMessageId&quot;: &quot;701&quot;,&#xd;
+            &quot;Msisdn&quot;: &quot;201020362608&quot;,&#xd;
+            &quot;Body&quot;: &quot;Hello&quot;&#xd;
+        },&#xd;
+        {&#xd;
+            &quot;ClientMessageId&quot;: &quot;701&quot;,&#xd;
+            &quot;Msisdn&quot;: &quot;201020362608&quot;,&#xd;
+            &quot;Body&quot;: &quot;Hello&quot;&#xd;
+        },&#xd;
+        {&#xd;
+            &quot;ClientMessageId&quot;: &quot;701&quot;,&#xd;
+            &quot;Msisdn&quot;: &quot;201020362608&quot;,&#xd;
+            &quot;Body&quot;: &quot;Hello&quot;&#xd;
+        },&#xd;
+        {&#xd;
+            &quot;ClientMessageId&quot;: &quot;701&quot;,&#xd;
+            &quot;Msisdn&quot;: &quot;201020362608&quot;,&#xd;
+            &quot;Body&quot;: &quot;Hello&quot;&#xd;
+        },&#xd;
+        {&#xd;
+            &quot;ClientMessageId&quot;: &quot;701&quot;,&#xd;
+            &quot;Msisdn&quot;: &quot;201020362608&quot;,&#xd;
+            &quot;Body&quot;: &quot;Hello&quot;&#xd;
+        },&#xd;
+        {&#xd;
+            &quot;ClientMessageId&quot;: &quot;701&quot;,&#xd;
+            &quot;Msisdn&quot;: &quot;201020362608&quot;,&#xd;
+            &quot;Body&quot;: &quot;Hello&quot;&#xd;
+        },&#xd;
+        {&#xd;
+            &quot;ClientMessageId&quot;: &quot;701&quot;,&#xd;
+            &quot;Msisdn&quot;: &quot;201020362608&quot;,&#xd;
+            &quot;Body&quot;: &quot;Hello&quot;&#xd;
+        },&#xd;
+        {&#xd;
+            &quot;ClientMessageId&quot;: &quot;701&quot;,&#xd;
+            &quot;Msisdn&quot;: &quot;201020362608&quot;,&#xd;
+            &quot;Body&quot;: &quot;Hello&quot;&#xd;
+        },&#xd;
+        {&#xd;
+            &quot;ClientMessageId&quot;: &quot;701&quot;,&#xd;
+            &quot;Msisdn&quot;: &quot;201020362608&quot;,&#xd;
+            &quot;Body&quot;: &quot;Hello&quot;&#xd;
+        },&#xd;
+        {&#xd;
+            &quot;ClientMessageId&quot;: &quot;701&quot;,&#xd;
+            &quot;Msisdn&quot;: &quot;201020362608&quot;,&#xd;
+            &quot;Body&quot;: &quot;Hello&quot;&#xd;
+        },&#xd;
+        {&#xd;
+            &quot;ClientMessageId&quot;: &quot;701&quot;,&#xd;
+            &quot;Msisdn&quot;: &quot;201020362608&quot;,&#xd;
+            &quot;Body&quot;: &quot;Hello&quot;&#xd;
+        },&#xd;
+        {&#xd;
+            &quot;ClientMessageId&quot;: &quot;701&quot;,&#xd;
+            &quot;Msisdn&quot;: &quot;201020362608&quot;,&#xd;
+            &quot;Body&quot;: &quot;Hello&quot;&#xd;
+        },&#xd;
+        {&#xd;
+            &quot;ClientMessageId&quot;: &quot;701&quot;,&#xd;
+            &quot;Msisdn&quot;: &quot;201020362608&quot;,&#xd;
+            &quot;Body&quot;: &quot;Hello&quot;&#xd;
+        },&#xd;
+        {&#xd;
+            &quot;ClientMessageId&quot;: &quot;701&quot;,&#xd;
+            &quot;Msisdn&quot;: &quot;201020362608&quot;,&#xd;
+            &quot;Body&quot;: &quot;Hello&quot;&#xd;
+        },&#xd;
+        {&#xd;
+            &quot;ClientMessageId&quot;: &quot;701&quot;,&#xd;
+            &quot;Msisdn&quot;: &quot;201020362608&quot;,&#xd;
+            &quot;Body&quot;: &quot;Hello&quot;&#xd;
+        },&#xd;
+        {&#xd;
+            &quot;ClientMessageId&quot;: &quot;701&quot;,&#xd;
+            &quot;Msisdn&quot;: &quot;201020362608&quot;,&#xd;
+            &quot;Body&quot;: &quot;Hello&quot;&#xd;
+        },&#xd;
+        {&#xd;
+            &quot;ClientMessageId&quot;: &quot;701&quot;,&#xd;
+            &quot;Msisdn&quot;: &quot;201020362608&quot;,&#xd;
+            &quot;Body&quot;: &quot;Hello&quot;&#xd;
+        },&#xd;
+        {&#xd;
+            &quot;ClientMessageId&quot;: &quot;701&quot;,&#xd;
+            &quot;Msisdn&quot;: &quot;201020362608&quot;,&#xd;
+            &quot;Body&quot;: &quot;Hello&quot;&#xd;
+        },&#xd;
+        {&#xd;
+            &quot;ClientMessageId&quot;: &quot;701&quot;,&#xd;
+            &quot;Msisdn&quot;: &quot;201020362608&quot;,&#xd;
+            &quot;Body&quot;: &quot;Hello&quot;&#xd;
+        },&#xd;
+        {&#xd;
+            &quot;ClientMessageId&quot;: &quot;701&quot;,&#xd;
+            &quot;Msisdn&quot;: &quot;201020362608&quot;,&#xd;
+            &quot;Body&quot;: &quot;Hello&quot;&#xd;
+        },&#xd;
+        {&#xd;
+            &quot;ClientMessageId&quot;: &quot;701&quot;,&#xd;
+            &quot;Msisdn&quot;: &quot;201020362608&quot;,&#xd;
+            &quot;Body&quot;: &quot;Hello&quot;&#xd;
+        },&#xd;
+        {&#xd;
+            &quot;ClientMessageId&quot;: &quot;701&quot;,&#xd;
+            &quot;Msisdn&quot;: &quot;201020362608&quot;,&#xd;
+            &quot;Body&quot;: &quot;Hello&quot;&#xd;
+        },&#xd;
+        {&#xd;
+            &quot;ClientMessageId&quot;: &quot;701&quot;,&#xd;
+            &quot;Msisdn&quot;: &quot;201020362608&quot;,&#xd;
+            &quot;Body&quot;: &quot;Hello&quot;&#xd;
+        },&#xd;
+        {&#xd;
+            &quot;ClientMessageId&quot;: &quot;701&quot;,&#xd;
+            &quot;Msisdn&quot;: &quot;201020362608&quot;,&#xd;
+            &quot;Body&quot;: &quot;Hello&quot;&#xd;
+        },&#xd;
+        {&#xd;
+            &quot;ClientMessageId&quot;: &quot;701&quot;,&#xd;
+            &quot;Msisdn&quot;: &quot;201020362608&quot;,&#xd;
+            &quot;Body&quot;: &quot;Hello&quot;&#xd;
+        },&#xd;
+        {&#xd;
+            &quot;ClientMessageId&quot;: &quot;701&quot;,&#xd;
+            &quot;Msisdn&quot;: &quot;201020362608&quot;,&#xd;
+            &quot;Body&quot;: &quot;Hello&quot;&#xd;
+        },&#xd;
+        {&#xd;
+            &quot;ClientMessageId&quot;: &quot;701&quot;,&#xd;
+            &quot;Msisdn&quot;: &quot;201020362608&quot;,&#xd;
+            &quot;Body&quot;: &quot;Hello&quot;&#xd;
+        },&#xd;
+        {&#xd;
+            &quot;ClientMessageId&quot;: &quot;701&quot;,&#xd;
+            &quot;Msisdn&quot;: &quot;201020362608&quot;,&#xd;
+            &quot;Body&quot;: &quot;Hello&quot;&#xd;
+        },&#xd;
+        {&#xd;
+            &quot;ClientMessageId&quot;: &quot;701&quot;,&#xd;
+            &quot;Msisdn&quot;: &quot;201020362608&quot;,&#xd;
+            &quot;Body&quot;: &quot;Hello&quot;&#xd;
+        },&#xd;
+        {&#xd;
+            &quot;ClientMessageId&quot;: &quot;701&quot;,&#xd;
+            &quot;Msisdn&quot;: &quot;201020362608&quot;,&#xd;
+            &quot;Body&quot;: &quot;Hello&quot;&#xd;
+        },&#xd;
+        {&#xd;
+            &quot;ClientMessageId&quot;: &quot;701&quot;,&#xd;
+            &quot;Msisdn&quot;: &quot;201020362608&quot;,&#xd;
+            &quot;Body&quot;: &quot;Hello&quot;&#xd;
+        },&#xd;
+        {&#xd;
+            &quot;ClientMessageId&quot;: &quot;701&quot;,&#xd;
+            &quot;Msisdn&quot;: &quot;201020362608&quot;,&#xd;
+            &quot;Body&quot;: &quot;Hello&quot;&#xd;
+        },&#xd;
+        {&#xd;
+            &quot;ClientMessageId&quot;: &quot;701&quot;,&#xd;
+            &quot;Msisdn&quot;: &quot;201020362608&quot;,&#xd;
+            &quot;Body&quot;: &quot;Hello&quot;&#xd;
+        },&#xd;
+        {&#xd;
+            &quot;ClientMessageId&quot;: &quot;701&quot;,&#xd;
+            &quot;Msisdn&quot;: &quot;201020362608&quot;,&#xd;
+            &quot;Body&quot;: &quot;Hello&quot;&#xd;
+        },&#xd;
+        {&#xd;
+            &quot;ClientMessageId&quot;: &quot;701&quot;,&#xd;
+            &quot;Msisdn&quot;: &quot;201020362608&quot;,&#xd;
+            &quot;Body&quot;: &quot;Hello&quot;&#xd;
+        },&#xd;
+        {&#xd;
+            &quot;ClientMessageId&quot;: &quot;701&quot;,&#xd;
+            &quot;Msisdn&quot;: &quot;201020362608&quot;,&#xd;
+            &quot;Body&quot;: &quot;Hello&quot;&#xd;
+        },&#xd;
+        {&#xd;
+            &quot;ClientMessageId&quot;: &quot;701&quot;,&#xd;
+            &quot;Msisdn&quot;: &quot;201020362608&quot;,&#xd;
+            &quot;Body&quot;: &quot;Hello&quot;&#xd;
+        },&#xd;
+        {&#xd;
+            &quot;ClientMessageId&quot;: &quot;701&quot;,&#xd;
+            &quot;Msisdn&quot;: &quot;201020362608&quot;,&#xd;
+            &quot;Body&quot;: &quot;Hello&quot;&#xd;
+        },&#xd;
+        {&#xd;
+            &quot;ClientMessageId&quot;: &quot;701&quot;,&#xd;
+            &quot;Msisdn&quot;: &quot;201020362608&quot;,&#xd;
+            &quot;Body&quot;: &quot;Hello&quot;&#xd;
+        },&#xd;
+        {&#xd;
+            &quot;ClientMessageId&quot;: &quot;701&quot;,&#xd;
+            &quot;Msisdn&quot;: &quot;201020362608&quot;,&#xd;
+            &quot;Body&quot;: &quot;Hello&quot;&#xd;
+        },&#xd;
+        {&#xd;
+            &quot;ClientMessageId&quot;: &quot;701&quot;,&#xd;
+            &quot;Msisdn&quot;: &quot;201020362608&quot;,&#xd;
+            &quot;Body&quot;: &quot;Hello&quot;&#xd;
+        },&#xd;
+        {&#xd;
+            &quot;ClientMessageId&quot;: &quot;701&quot;,&#xd;
+            &quot;Msisdn&quot;: &quot;201020362608&quot;,&#xd;
+            &quot;Body&quot;: &quot;Hello&quot;&#xd;
+        },&#xd;
+        {&#xd;
+            &quot;ClientMessageId&quot;: &quot;701&quot;,&#xd;
+            &quot;Msisdn&quot;: &quot;201020362608&quot;,&#xd;
+            &quot;Body&quot;: &quot;Hello&quot;&#xd;
+        },&#xd;
+        {&#xd;
+            &quot;ClientMessageId&quot;: &quot;701&quot;,&#xd;
+            &quot;Msisdn&quot;: &quot;201020362608&quot;,&#xd;
+            &quot;Body&quot;: &quot;Hello&quot;&#xd;
+        },&#xd;
+        {&#xd;
+            &quot;ClientMessageId&quot;: &quot;701&quot;,&#xd;
+            &quot;Msisdn&quot;: &quot;201020362608&quot;,&#xd;
+            &quot;Body&quot;: &quot;Hello&quot;&#xd;
+        },&#xd;
+        {&#xd;
+            &quot;ClientMessageId&quot;: &quot;701&quot;,&#xd;
+            &quot;Msisdn&quot;: &quot;201020362608&quot;,&#xd;
+            &quot;Body&quot;: &quot;Hello&quot;&#xd;
+        },&#xd;
+        {&#xd;
+            &quot;ClientMessageId&quot;: &quot;701&quot;,&#xd;
+            &quot;Msisdn&quot;: &quot;201020362608&quot;,&#xd;
+            &quot;Body&quot;: &quot;Hello&quot;&#xd;
+        },&#xd;
+        {&#xd;
+            &quot;ClientMessageId&quot;: &quot;701&quot;,&#xd;
+            &quot;Msisdn&quot;: &quot;201020362608&quot;,&#xd;
+            &quot;Body&quot;: &quot;Hello&quot;&#xd;
+        },&#xd;
+        {&#xd;
+            &quot;ClientMessageId&quot;: &quot;701&quot;,&#xd;
+            &quot;Msisdn&quot;: &quot;201020362608&quot;,&#xd;
+            &quot;Body&quot;: &quot;Hello&quot;&#xd;
+        },&#xd;
+        {&#xd;
+            &quot;ClientMessageId&quot;: &quot;701&quot;,&#xd;
+            &quot;Msisdn&quot;: &quot;201020362608&quot;,&#xd;
+            &quot;Body&quot;: &quot;Hello&quot;&#xd;
+        },&#xd;
+        {&#xd;
+            &quot;ClientMessageId&quot;: &quot;701&quot;,&#xd;
+            &quot;Msisdn&quot;: &quot;201020362608&quot;,&#xd;
+            &quot;Body&quot;: &quot;Hello&quot;&#xd;
+        },&#xd;
+        {&#xd;
+            &quot;ClientMessageId&quot;: &quot;701&quot;,&#xd;
+            &quot;Msisdn&quot;: &quot;201020362608&quot;,&#xd;
+            &quot;Body&quot;: &quot;Hello&quot;&#xd;
+        },&#xd;
+        {&#xd;
+            &quot;ClientMessageId&quot;: &quot;701&quot;,&#xd;
+            &quot;Msisdn&quot;: &quot;201020362608&quot;,&#xd;
+            &quot;Body&quot;: &quot;Hello&quot;&#xd;
+        },&#xd;
+        {&#xd;
+            &quot;ClientMessageId&quot;: &quot;701&quot;,&#xd;
+            &quot;Msisdn&quot;: &quot;201020362608&quot;,&#xd;
+            &quot;Body&quot;: &quot;Hello&quot;&#xd;
+        },&#xd;
+        {&#xd;
+            &quot;ClientMessageId&quot;: &quot;701&quot;,&#xd;
+            &quot;Msisdn&quot;: &quot;201020362608&quot;,&#xd;
+            &quot;Body&quot;: &quot;Hello&quot;&#xd;
+        },&#xd;
+        {&#xd;
+            &quot;ClientMessageId&quot;: &quot;701&quot;,&#xd;
+            &quot;Msisdn&quot;: &quot;201020362608&quot;,&#xd;
+            &quot;Body&quot;: &quot;Hello&quot;&#xd;
+        },&#xd;
+        {&#xd;
+            &quot;ClientMessageId&quot;: &quot;701&quot;,&#xd;
+            &quot;Msisdn&quot;: &quot;201020362608&quot;,&#xd;
+            &quot;Body&quot;: &quot;Hello&quot;&#xd;
+        },&#xd;
+        {&#xd;
+            &quot;ClientMessageId&quot;: &quot;701&quot;,&#xd;
+            &quot;Msisdn&quot;: &quot;201020362608&quot;,&#xd;
+            &quot;Body&quot;: &quot;Hello&quot;&#xd;
+        },&#xd;
+        {&#xd;
+            &quot;ClientMessageId&quot;: &quot;701&quot;,&#xd;
+            &quot;Msisdn&quot;: &quot;201020362608&quot;,&#xd;
+            &quot;Body&quot;: &quot;Hello&quot;&#xd;
+        },&#xd;
+        {&#xd;
+            &quot;ClientMessageId&quot;: &quot;701&quot;,&#xd;
+            &quot;Msisdn&quot;: &quot;201020362608&quot;,&#xd;
+            &quot;Body&quot;: &quot;Hello&quot;&#xd;
+        },&#xd;
+        {&#xd;
+            &quot;ClientMessageId&quot;: &quot;701&quot;,&#xd;
+            &quot;Msisdn&quot;: &quot;201020362608&quot;,&#xd;
+            &quot;Body&quot;: &quot;Hello&quot;&#xd;
+        },&#xd;
+        {&#xd;
+            &quot;ClientMessageId&quot;: &quot;701&quot;,&#xd;
+            &quot;Msisdn&quot;: &quot;201020362608&quot;,&#xd;
+            &quot;Body&quot;: &quot;Hello&quot;&#xd;
+        },&#xd;
+        {&#xd;
+            &quot;ClientMessageId&quot;: &quot;701&quot;,&#xd;
+            &quot;Msisdn&quot;: &quot;201020362608&quot;,&#xd;
+            &quot;Body&quot;: &quot;Hello&quot;&#xd;
+        },&#xd;
+        {&#xd;
+            &quot;ClientMessageId&quot;: &quot;701&quot;,&#xd;
+            &quot;Msisdn&quot;: &quot;201020362608&quot;,&#xd;
+            &quot;Body&quot;: &quot;Hello&quot;&#xd;
+        },&#xd;
+        {&#xd;
+            &quot;ClientMessageId&quot;: &quot;701&quot;,&#xd;
+            &quot;Msisdn&quot;: &quot;201020362608&quot;,&#xd;
+            &quot;Body&quot;: &quot;Hello&quot;&#xd;
+        },&#xd;
+        {&#xd;
+            &quot;ClientMessageId&quot;: &quot;701&quot;,&#xd;
+            &quot;Msisdn&quot;: &quot;201020362608&quot;,&#xd;
+            &quot;Body&quot;: &quot;Hello&quot;&#xd;
+        },&#xd;
+        {&#xd;
+            &quot;ClientMessageId&quot;: &quot;701&quot;,&#xd;
+            &quot;Msisdn&quot;: &quot;201020362608&quot;,&#xd;
+            &quot;Body&quot;: &quot;Hello&quot;&#xd;
+        }&#xd;
+      &#xd;
+        &#xd;
+    ]&#xd;
+}</stringProp>
+                  <stringProp name="Argument.metadata">=</stringProp>
+                </elementProp>
+              </collectionProp>
+            </elementProp>
+          </HTTPSamplerProxy>
+          <hashTree/>
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Encrypt" enabled="false">
+            <stringProp name="HTTPSampler.domain">10.2.10.209</stringProp>
+            <stringProp name="HTTPSampler.port">5051</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
+            <stringProp name="HTTPSampler.path">/api/EncryptionHelper/Encrypt</stringProp>
+            <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+            <stringProp name="HTTPSampler.method">POST</stringProp>
+            <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+            <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+            <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+              <collectionProp name="Arguments.arguments">
+                <elementProp name="" elementType="HTTPArgument">
+                  <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                  <stringProp name="Argument.value">{&#xd;
+    &quot;plainText&quot;: &quot;cloudcom@2026_NewCpass&quot;  &#xd;
+}</stringProp>
+                  <stringProp name="Argument.metadata">=</stringProp>
+                </elementProp>
+              </collectionProp>
+            </elementProp>
+          </HTTPSamplerProxy>
+          <hashTree/>
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Add All Pending Requests To Queue" enabled="false">
+            <stringProp name="HTTPSampler.domain">10.2.10.209</stringProp>
+            <stringProp name="HTTPSampler.port">5051</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
+            <stringProp name="HTTPSampler.path">/api/QueueControl/AddAllPendingRequestsToQueue</stringProp>
+            <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+            <stringProp name="HTTPSampler.method">POST</stringProp>
+            <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+            <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+            <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+              <collectionProp name="Arguments.arguments">
+                <elementProp name="" elementType="HTTPArgument">
+                  <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                  <stringProp name="Argument.value">{&#xd;
+    &quot;from&quot;: &quot;2025-01-15T00:00:00Z&quot;,&#xd;
+    &quot;to&quot;: &quot;2025-12-15T20:30:00Z&quot; &#xd;
+}</stringProp>
+                  <stringProp name="Argument.metadata">=</stringProp>
+                </elementProp>
+              </collectionProp>
+            </elementProp>
+          </HTTPSamplerProxy>
+          <hashTree/>
+        </hashTree>
+        <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="View Results Tree">
+          <boolProp name="ResultCollector.error_logging">false</boolProp>
+          <objProp>
+            <name>saveConfig</name>
+            <value class="SampleSaveConfiguration">
+              <time>true</time>
+              <latency>true</latency>
+              <timestamp>true</timestamp>
+              <success>true</success>
+              <label>true</label>
+              <code>true</code>
+              <message>true</message>
+              <threadName>true</threadName>
+              <dataType>true</dataType>
+              <encoding>false</encoding>
+              <assertions>true</assertions>
+              <subresults>true</subresults>
+              <responseData>false</responseData>
+              <samplerData>false</samplerData>
+              <xml>false</xml>
+              <fieldNames>true</fieldNames>
+              <responseHeaders>false</responseHeaders>
+              <requestHeaders>false</requestHeaders>
+              <responseDataOnError>false</responseDataOnError>
+              <saveAssertionResultsFailureMessage>true</saveAssertionResultsFailureMessage>
+              <assertionsResultsToSave>0</assertionsResultsToSave>
+              <bytes>true</bytes>
+              <sentBytes>true</sentBytes>
+              <url>true</url>
+              <threadCounts>true</threadCounts>
+              <idleTime>true</idleTime>
+              <connectTime>true</connectTime>
+            </value>
+          </objProp>
+          <stringProp name="filename"></stringProp>
+        </ResultCollector>
+        <hashTree/>
+        <ResultCollector guiclass="SummaryReport" testclass="ResultCollector" testname="Summary Report">
+          <boolProp name="ResultCollector.error_logging">false</boolProp>
+          <objProp>
+            <name>saveConfig</name>
+            <value class="SampleSaveConfiguration">
+              <time>true</time>
+              <latency>true</latency>
+              <timestamp>true</timestamp>
+              <success>true</success>
+              <label>true</label>
+              <code>true</code>
+              <message>true</message>
+              <threadName>true</threadName>
+              <dataType>true</dataType>
+              <encoding>false</encoding>
+              <assertions>true</assertions>
+              <subresults>true</subresults>
+              <responseData>false</responseData>
+              <samplerData>false</samplerData>
+              <xml>false</xml>
+              <fieldNames>true</fieldNames>
+              <responseHeaders>false</responseHeaders>
+              <requestHeaders>false</requestHeaders>
+              <responseDataOnError>false</responseDataOnError>
+              <saveAssertionResultsFailureMessage>true</saveAssertionResultsFailureMessage>
+              <assertionsResultsToSave>0</assertionsResultsToSave>
+              <bytes>true</bytes>
+              <sentBytes>true</sentBytes>
+              <url>true</url>
+              <threadCounts>true</threadCounts>
+              <idleTime>true</idleTime>
+              <connectTime>true</connectTime>
+            </value>
+          </objProp>
+          <stringProp name="filename"></stringProp>
+        </ResultCollector>
+        <hashTree/>
+        <ResultCollector guiclass="StatVisualizer" testclass="ResultCollector" testname="Aggregate Report">
+          <boolProp name="ResultCollector.error_logging">false</boolProp>
+          <objProp>
+            <name>saveConfig</name>
+            <value class="SampleSaveConfiguration">
+              <time>true</time>
+              <latency>true</latency>
+              <timestamp>true</timestamp>
+              <success>true</success>
+              <label>true</label>
+              <code>true</code>
+              <message>true</message>
+              <threadName>true</threadName>
+              <dataType>true</dataType>
+              <encoding>false</encoding>
+              <assertions>true</assertions>
+              <subresults>true</subresults>
+              <responseData>false</responseData>
+              <samplerData>false</samplerData>
+              <xml>false</xml>
+              <fieldNames>true</fieldNames>
+              <responseHeaders>false</responseHeaders>
+              <requestHeaders>false</requestHeaders>
+              <responseDataOnError>false</responseDataOnError>
+              <saveAssertionResultsFailureMessage>true</saveAssertionResultsFailureMessage>
+              <assertionsResultsToSave>0</assertionsResultsToSave>
+              <bytes>true</bytes>
+              <sentBytes>true</sentBytes>
+              <url>true</url>
+              <threadCounts>true</threadCounts>
+              <idleTime>true</idleTime>
+              <connectTime>true</connectTime>
+            </value>
+          </objProp>
+          <stringProp name="filename"></stringProp>
+        </ResultCollector>
+        <hashTree/>
+      </hashTree>
+      <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="View Results Tree">
+        <boolProp name="ResultCollector.error_logging">true</boolProp>
+        <objProp>
+          <name>saveConfig</name>
+          <value class="SampleSaveConfiguration">
+            <time>true</time>
+            <latency>true</latency>
+            <timestamp>true</timestamp>
+            <success>true</success>
+            <label>true</label>
+            <code>true</code>
+            <message>true</message>
+            <threadName>true</threadName>
+            <dataType>true</dataType>
+            <encoding>false</encoding>
+            <assertions>true</assertions>
+            <subresults>true</subresults>
+            <responseData>false</responseData>
+            <samplerData>false</samplerData>
+            <xml>false</xml>
+            <fieldNames>true</fieldNames>
+            <responseHeaders>false</responseHeaders>
+            <requestHeaders>false</requestHeaders>
+            <responseDataOnError>false</responseDataOnError>
+            <saveAssertionResultsFailureMessage>true</saveAssertionResultsFailureMessage>
+            <assertionsResultsToSave>0</assertionsResultsToSave>
+            <bytes>true</bytes>
+            <sentBytes>true</sentBytes>
+            <url>true</url>
+            <threadCounts>true</threadCounts>
+            <idleTime>true</idleTime>
+            <connectTime>true</connectTime>
+          </value>
+        </objProp>
+        <stringProp name="filename"></stringProp>
+      </ResultCollector>
+      <hashTree/>
+      <ResultCollector guiclass="SummaryReport" testclass="ResultCollector" testname="Summary Report">
+        <boolProp name="ResultCollector.error_logging">false</boolProp>
+        <objProp>
+          <name>saveConfig</name>
+          <value class="SampleSaveConfiguration">
+            <time>true</time>
+            <latency>true</latency>
+            <timestamp>true</timestamp>
+            <success>true</success>
+            <label>true</label>
+            <code>true</code>
+            <message>true</message>
+            <threadName>true</threadName>
+            <dataType>true</dataType>
+            <encoding>false</encoding>
+            <assertions>true</assertions>
+            <subresults>true</subresults>
+            <responseData>false</responseData>
+            <samplerData>false</samplerData>
+            <xml>false</xml>
+            <fieldNames>true</fieldNames>
+            <responseHeaders>false</responseHeaders>
+            <requestHeaders>false</requestHeaders>
+            <responseDataOnError>false</responseDataOnError>
+            <saveAssertionResultsFailureMessage>true</saveAssertionResultsFailureMessage>
+            <assertionsResultsToSave>0</assertionsResultsToSave>
+            <bytes>true</bytes>
+            <sentBytes>true</sentBytes>
+            <url>true</url>
+            <threadCounts>true</threadCounts>
+            <idleTime>true</idleTime>
+            <connectTime>true</connectTime>
+          </value>
+        </objProp>
+        <stringProp name="filename"></stringProp>
+      </ResultCollector>
+      <hashTree/>
+      <ResultCollector guiclass="StatVisualizer" testclass="ResultCollector" testname="Aggregate Report">
+        <boolProp name="ResultCollector.error_logging">false</boolProp>
+        <objProp>
+          <name>saveConfig</name>
+          <value class="SampleSaveConfiguration">
+            <time>true</time>
+            <latency>true</latency>
+            <timestamp>true</timestamp>
+            <success>true</success>
+            <label>true</label>
+            <code>true</code>
+            <message>true</message>
+            <threadName>true</threadName>
+            <dataType>true</dataType>
+            <encoding>false</encoding>
+            <assertions>true</assertions>
+            <subresults>true</subresults>
+            <responseData>false</responseData>
+            <samplerData>false</samplerData>
+            <xml>false</xml>
+            <fieldNames>true</fieldNames>
+            <responseHeaders>false</responseHeaders>
+            <requestHeaders>false</requestHeaders>
+            <responseDataOnError>false</responseDataOnError>
+            <saveAssertionResultsFailureMessage>true</saveAssertionResultsFailureMessage>
+            <assertionsResultsToSave>0</assertionsResultsToSave>
+            <bytes>true</bytes>
+            <sentBytes>true</sentBytes>
+            <url>true</url>
+            <threadCounts>true</threadCounts>
+            <idleTime>true</idleTime>
+            <connectTime>true</connectTime>
+          </value>
+        </objProp>
+        <stringProp name="filename"></stringProp>
+      </ResultCollector>
+      <hashTree/>
+    </hashTree>
+  </hashTree>
+</jmeterTestPlan>
